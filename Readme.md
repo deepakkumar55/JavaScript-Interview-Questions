@@ -1166,7 +1166,7 @@ A complete guide with **JavaScript Interview Questions** — from **core concept
   
   console.log('End');
   ```
-  
+  ```
   **Output Order:**
   1. Start
   2. End
