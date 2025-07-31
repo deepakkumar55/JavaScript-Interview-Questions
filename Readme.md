@@ -641,6 +641,563 @@ A complete guide with **JavaScript Interview Questions** — from **core concept
   - Functional composition
 </details>
 
+<details>
+  <summary>What is the call stack and how does it work?</summary>
+  
+  The call stack is a data structure that keeps track of function calls in a JavaScript program. It uses a Last In, First Out (LIFO) principle.
+  
+  **How it works:**
+  1. When a function is called, it's pushed onto the stack
+  2. When a function returns, it's popped off the stack
+  3. The engine executes functions from the top of the stack
+  4. If the stack gets too deep, it causes a "stack overflow" error
+  
+  **Example:**
+  ```javascript
+  function first() {
+    console.log('First function start');
+    second();
+    console.log('First function end');
+  }
+  
+  function second() {
+    console.log('Second function start');
+    third();
+    console.log('Second function end');
+  }
+  
+  function third() {
+    console.log('Third function');
+  }
+  
+  first();
+  ```
+  
+  **Call Stack Visualization:**
+  ```
+  Step 1: first() called
+  ┌─────────┐
+  │ first() │
+  └─────────┘
+  
+  Step 2: second() called from first()
+  ┌──────────┐
+  │ second() │
+  ├──────────┤
+  │ first()  │
+  └──────────┘
+  
+  Step 3: third() called from second()
+  ┌─────────┐
+  │ third() │
+  ├─────────┤
+  │second() │
+  ├─────────┤
+  │ first() │
+  └─────────┘
+  
+  Step 4: third() returns
+  ┌──────────┐
+  │ second() │
+  ├──────────┤
+  │ first()  │
+  └──────────┘
+  
+  Step 5: second() returns
+  ┌─────────┐
+  │ first() │
+  └─────────┘
+  
+  Step 6: first() returns - stack empty
+  ```
+  
+  **Stack Overflow Example:**
+  ```javascript
+  function recursiveFunction() {
+    recursiveFunction(); // Infinite recursion
+  }
+  
+  recursiveFunction(); // RangeError: Maximum call stack size exceeded
+  ```
+</details>
+
+<details>
+  <summary>What are call(), apply(), and bind() methods?</summary>
+  
+  These methods allow you to explicitly set the `this` context and invoke functions with specific arguments.
+  
+  **call():**
+  - Invokes function immediately with specified `this` value
+  - Arguments passed individually
+  
+  ```javascript
+  const person = { name: 'Deepak' };
+  
+  function greet(greeting, punctuation) {
+    console.log(`${greeting}, ${this.name}${punctuation}`);
+  }
+  
+  greet.call(person, 'Hello', '!'); // "Hello, Deepak!"
+  ```
+  
+  **apply():**
+  - Similar to `call()` but arguments passed as an array
+  - Useful when you have arguments in array form
+  
+  ```javascript
+  const person = { name: 'Deepak' };
+  
+  function greet(greeting, punctuation) {
+    console.log(`${greeting}, ${this.name}${punctuation}`);
+  }
+  
+  greet.apply(person, ['Hello', '!']); // "Hello, Deepak!"
+  
+  // Practical use: finding max in array
+  const numbers = [1, 5, 3, 9, 2];
+  const max = Math.max.apply(null, numbers); // 9
+  ```
+  
+  **bind():**
+  - Returns a new function with specified `this` value
+  - Does not invoke immediately
+  - Can also partially apply arguments
+  
+  ```javascript
+  const person = { name: 'Deepak' };
+  
+  function greet(greeting, punctuation) {
+    console.log(`${greeting}, ${this.name}${punctuation}`);
+  }
+  
+  const boundGreet = greet.bind(person, 'Hello');
+  boundGreet('!'); // "Hello, Deepak!"
+  
+  // Event handler example
+  const button = document.getElementById('myButton');
+  const handler = {
+    message: 'Button clicked!',
+    handleClick: function(event) {
+      console.log(this.message);
+    }
+  };
+  
+  button.addEventListener('click', handler.handleClick.bind(handler));
+  ```
+  
+  **Comparison:**
+  ```javascript
+  const obj = { x: 42 };
+  
+  function test(a, b) {
+    console.log(this.x, a, b);
+  }
+  
+  test.call(obj, 1, 2);      // 42 1 2 (immediate invocation)
+  test.apply(obj, [1, 2]);   // 42 1 2 (immediate invocation)
+  test.bind(obj, 1, 2)();    // 42 1 2 (returns new function)
+  ```
+</details>
+
+<details>
+  <summary>How do IIFE (Immediately Invoked Function Expressions) work?</summary>
+  
+  IIFE is a function that runs immediately after it's defined. It's commonly used to create a private scope and avoid polluting the global namespace.
+  
+  **Basic Syntax:**
+  ```javascript
+  // Method 1: Wrapping function in parentheses
+  (function() {
+    console.log('IIFE executed!');
+  })();
+  
+  // Method 2: Wrapping entire expression
+  (function() {
+    console.log('IIFE executed!');
+  }());
+  
+  // Arrow function IIFE
+  (() => {
+    console.log('Arrow IIFE executed!');
+  })();
+  ```
+  
+  **With Parameters:**
+  ```javascript
+  (function(name, age) {
+    console.log(`Hello, ${name}! You are ${age} years old.`);
+  })('Deepak', 25);
+  
+  // Passing global objects
+  (function(window, document) {
+    // Use window and document safely
+    console.log('Window:', window);
+    console.log('Document:', document);
+  })(window, document);
+  ```
+  
+  **Creating Private Scope:**
+  ```javascript
+  const counter = (function() {
+    let count = 0; // Private variable
+    
+    return {
+      increment: function() {
+        count++;
+        return count;
+      },
+      decrement: function() {
+        count--;
+        return count;
+      },
+      getCount: function() {
+        return count;
+      }
+    };
+  })();
+  
+  console.log(counter.increment()); // 1
+  console.log(counter.increment()); // 2
+  console.log(counter.getCount());  // 2
+  // console.log(count); // ReferenceError: count is not defined
+  ```
+  
+  **Module Pattern:**
+  ```javascript
+  const MyModule = (function() {
+    // Private variables and functions
+    let privateVar = 'I am private';
+    
+    function privateFunction() {
+      console.log('This is private');
+    }
+    
+    // Public API
+    return {
+      publicMethod: function() {
+        console.log('This is public');
+        privateFunction(); // Can access private function
+      },
+      getPrivateVar: function() {
+        return privateVar;
+      }
+    };
+  })();
+  
+  MyModule.publicMethod(); // "This is public" then "This is private"
+  console.log(MyModule.getPrivateVar()); // "I am private"
+  ```
+  
+  **Use Cases:**
+  - Avoiding global namespace pollution
+  - Creating modules with private/public members
+  - Initialization code that runs once
+  - Creating closures with specific values
+</details>
+
+<details>
+  <summary>How do closures help in data privacy (e.g., counters)?</summary>
+  
+  Closures provide a way to create private variables and methods in JavaScript by encapsulating data within a function scope that's not accessible from outside.
+  
+  **Simple Counter Example:**
+  ```javascript
+  function createCounter() {
+    let count = 0; // Private variable
+    
+    return function() {
+      count++; // Access to private variable
+      return count;
+    };
+  }
+  
+  const counter1 = createCounter();
+  const counter2 = createCounter();
+  
+  console.log(counter1()); // 1
+  console.log(counter1()); // 2
+  console.log(counter2()); // 1 (independent counter)
+  console.log(counter1()); // 3
+  
+  // count is not accessible directly
+  // console.log(count); // ReferenceError: count is not defined
+  ```
+  
+  **Advanced Counter with Multiple Methods:**
+  ```javascript
+  function createAdvancedCounter(initialValue = 0) {
+    let count = initialValue; // Private variable
+    
+    return {
+      increment: function() {
+        count++;
+        return count;
+      },
+      decrement: function() {
+        count--;
+        return count;
+      },
+      getValue: function() {
+        return count;
+      },
+      reset: function() {
+        count = initialValue;
+        return count;
+      }
+    };
+  }
+  
+  const counter = createAdvancedCounter(10);
+  console.log(counter.getValue()); // 10
+  console.log(counter.increment()); // 11
+  console.log(counter.decrement()); // 10
+  console.log(counter.reset()); // 10
+  ```
+  
+  **Bank Account Example:**
+  ```javascript
+  function createBankAccount(initialBalance) {
+    let balance = initialBalance; // Private variable
+    let transactionHistory = []; // Private variable
+    
+    return {
+      deposit: function(amount) {
+        if (amount > 0) {
+          balance += amount;
+          transactionHistory.push(`Deposited: $${amount}`);
+          return balance;
+        }
+        throw new Error('Deposit amount must be positive');
+      },
+      
+      withdraw: function(amount) {
+        if (amount > 0 && amount <= balance) {
+          balance -= amount;
+          transactionHistory.push(`Withdrawn: $${amount}`);
+          return balance;
+        }
+        throw new Error('Invalid withdrawal amount');
+      },
+      
+      getBalance: function() {
+        return balance;
+      },
+      
+      getHistory: function() {
+        return [...transactionHistory]; // Return copy, not reference
+      }
+    };
+  }
+  
+  const account = createBankAccount(1000);
+  console.log(account.deposit(200)); // 1200
+  console.log(account.withdraw(100)); // 1100
+  console.log(account.getBalance()); // 1100
+  console.log(account.getHistory()); // ["Deposited: $200", "Withdrawn: $100"]
+  
+  // Private variables are not accessible
+  // console.log(balance); // ReferenceError
+  ```
+  
+  **Configuration Object with Private Settings:**
+  ```javascript
+  function createConfig() {
+    const privateSettings = { // Private object
+      apiKey: 'secret-key-123',
+      debugMode: false,
+      maxRetries: 3
+    };
+    
+    return {
+      get: function(key) {
+        return privateSettings[key];
+      },
+      
+      set: function(key, value) {
+        if (key === 'apiKey') {
+          throw new Error('API key cannot be changed');
+        }
+        privateSettings[key] = value;
+      },
+      
+      isDebugMode: function() {
+        return privateSettings.debugMode;
+      }
+    };
+  }
+  
+  const config = createConfig();
+  console.log(config.get('maxRetries')); // 3
+  config.set('debugMode', true);
+  console.log(config.isDebugMode()); // true
+  // config.set('apiKey', 'new-key'); // Error: API key cannot be changed
+  ```
+</details>
+
+<details>
+  <summary>What is memoization and how can closures help implement it?</summary>
+  
+  Memoization is an optimization technique that stores the results of expensive function calls and returns the cached result when the same inputs occur again.
+  
+  **Basic Memoization Example:**
+  ```javascript
+  function memoize(fn) {
+    const cache = {}; // Private cache using closure
+    
+    return function(...args) {
+      const key = JSON.stringify(args);
+      
+      if (cache[key]) {
+        console.log('Cache hit!');
+        return cache[key];
+      }
+      
+      console.log('Computing result...');
+      const result = fn.apply(this, args);
+      cache[key] = result;
+      
+      return result;
+    };
+  }
+  
+  // Expensive function example
+  function fibonacci(n) {
+    if (n <= 1) return n;
+    return fibonacci(n - 1) + fibonacci(n - 2);
+  }
+  
+  const memoizedFibonacci = memoize(fibonacci);
+  
+  console.log(memoizedFibonacci(10)); // Computing result... 55
+  console.log(memoizedFibonacci(10)); // Cache hit! 55
+  ```
+  
+  **Advanced Memoization with TTL (Time To Live):**
+  ```javascript
+  function memoizeWithTTL(fn, ttl = 5000) {
+    const cache = {}; // Private cache
+    
+    return function(...args) {
+      const key = JSON.stringify(args);
+      const now = Date.now();
+      
+      // Check if cached result exists and hasn't expired
+      if (cache[key] && (now - cache[key].timestamp) < ttl) {
+        console.log('Cache hit!');
+        return cache[key].value;
+      }
+      
+      console.log('Computing result...');
+      const result = fn.apply(this, args);
+      
+      // Store result with timestamp
+      cache[key] = {
+        value: result,
+        timestamp: now
+      };
+      
+      return result;
+    };
+  }
+  
+  const expensiveOperation = (x, y) => {
+    // Simulate expensive operation
+    let sum = 0;
+    for (let i = 0; i < 1000000; i++) {
+      sum += x * y;
+    }
+    return sum;
+  };
+  
+  const memoizedOperation = memoizeWithTTL(expensiveOperation, 3000);
+  ```
+  
+  **Memoization with Size Limit (LRU Cache):**
+  ```javascript
+  function memoizeWithLimit(fn, limit = 100) {
+    const cache = new Map(); // Using Map to maintain insertion order
+    
+    return function(...args) {
+      const key = JSON.stringify(args);
+      
+      if (cache.has(key)) {
+        // Move to end (most recently used)
+        const value = cache.get(key);
+        cache.delete(key);
+        cache.set(key, value);
+        console.log('Cache hit!');
+        return value;
+      }
+      
+      console.log('Computing result...');
+      const result = fn.apply(this, args);
+      
+      // Remove oldest entry if cache is full
+      if (cache.size >= limit) {
+        const firstKey = cache.keys().next().value;
+        cache.delete(firstKey);
+      }
+      
+      cache.set(key, result);
+      return result;
+    };
+  }
+  ```
+  
+  **Practical Example - API Call Memoization:**
+  ```javascript
+  function memoizeApiCall() {
+    const cache = {}; // Private cache
+    const pendingRequests = {}; // Prevent duplicate requests
+    
+    return async function fetchUser(userId) {
+      const key = `user-${userId}`;
+      
+      // Return cached result if available
+      if (cache[key]) {
+        console.log('Returning cached user data');
+        return cache[key];
+      }
+      
+      // Return pending request if already in progress
+      if (pendingRequests[key]) {
+        console.log('Request already in progress, waiting...');
+        return pendingRequests[key];
+      }
+      
+      // Make new request
+      console.log('Fetching user data from API...');
+      const request = fetch(`/api/users/${userId}`)
+        .then(response => response.json())
+        .then(data => {
+          cache[key] = data; // Cache the result
+          delete pendingRequests[key]; // Remove from pending
+          return data;
+        })
+        .catch(error => {
+          delete pendingRequests[key]; // Remove from pending on error
+          throw error;
+        });
+      
+      pendingRequests[key] = request; // Track pending request
+      return request;
+    };
+  }
+  
+  const memoizedFetchUser = memoizeApiCall();
+  
+  // Usage
+  memoizedFetchUser(1).then(user => console.log(user));
+  memoizedFetchUser(1).then(user => console.log(user)); // Returns cached result
+  ```
+  
+  **Benefits of Closure-based Memoization:**
+  - **Privacy**: Cache is not accessible from outside
+  - **Persistence**: Cache persists between function calls
+  - **Flexibility**: Can implement different caching strategies
+  - **Memory Management**: Can implement cache expiration and limits
+</details>
+
 #### 🔹 Section 3: Objects, Arrays & DOM
 <details>
   <summary>What's the difference between dot and bracket notation?</summary>
@@ -1166,8 +1723,9 @@ A complete guide with **JavaScript Interview Questions** — from **core concept
   
   console.log('End');
   ```
-  ```
+  
   **Output Order:**
+  ```
   1. Start
   2. End
   3. requestAnimationFrame 1
