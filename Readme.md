@@ -1,6 +1,6 @@
 # 📘 JavaScript Interview Questions (Beginner to Advanced)
 
-A complete guide with ** JavaScript Interview Questions** — from **core concepts** to **ES6+ features**, including **real-world scenarios**, **performance tips**, and **best practices**. This list is crafted to help you **revise**, **understand deeply**, and **crack your next frontend or MERN stack interview** with confidence.
+A complete guide with **JavaScript Interview Questions** — from **core concepts** to **ES6+ features**, including **real-world scenarios**, **performance tips**, and **best practices**. This list is crafted to help you **revise**, **understand deeply**, and **crack your next frontend or MERN stack interview** with confidence.
 
 ---
 #### 🔹 Section 1: Core Concepts & Syntax
